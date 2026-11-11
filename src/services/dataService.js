@@ -1,3 +1,5 @@
+import apiClient from './apiClient';
+
 // Dataset simulado estático
 const datasetSimulado = [
   { id: 1, nombre: 'Laptop Gamer', precio: 15500, stock: 12 },
@@ -29,5 +31,19 @@ export const procesarDatos = (datos) => {
       valorTotalInventario,
       totalStock
     }
+  };
+};
+
+export const obtenerSerieDeTiempo = async () => {
+  // Petición GET a Open-Meteo para obtener clima actual (ejemplo de datos analíticos)[cite: 18, 19]
+  const response = await apiClient.get('/forecast?latitude=19.4284&longitude=-99.1276&current_weather=true');
+  
+  // Extraer el payload limpio[cite: 18]
+  const clima = response.data.current_weather;
+  
+  return {
+    temperatura: clima.temperature,
+    viento: clima.windspeed,
+    tiempo: clima.time
   };
 };

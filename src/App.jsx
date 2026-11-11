@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import TarjetaMetrica from './components/TarjetaMetrica';
 import TablaDatos from './components/TablaDatos';
+import PanelAnalitico from './components/PanelAnalitico';
 import { obtenerDatosVisualizacion, procesarDatos } from './services/dataService';
 import './App.css';
 
@@ -63,6 +64,7 @@ function App() {
 
         {/* Instancia de TablaDatos inyectando el estado[cite: 71] */}
         <TablaDatos datos={datos} />
+        <PanelAnalitico /> 
       </main>
     </div>
   );
