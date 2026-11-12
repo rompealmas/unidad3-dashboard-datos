@@ -23,24 +23,23 @@ function TablaDatos({ datos }) {
 
   return (
     <div style={estilosTablaContenedor}>
-      <h3 style={{ color: '#334155' }}>Detalle de Productos</h3>
+      <h3 style={{ color: '#334155' }}>Detalle Mensual</h3>
       <table style={estilosTabla}>
         <thead>
-          <tr style={{ backgroundColor: '#f8fafc' }}>
-            <th style={estilosCelda}>ID</th>
-            <th style={estilosCelda}>Nombre</th>
-            <th style={estilosCelda}>Precio ($)</th>
-            <th style={estilosCelda}>Stock</th>
+          <tr style={{ backgroundColor: '#1e293b', color: 'white' }}>
+            <th style={estilosCelda}>Mes</th>
+            <th style={estilosCelda}>Ventas</th>
+            <th style={estilosCelda}>Usuarios</th>
+            <th style={estilosCelda}>Conversión (%)</th>
           </tr>
         </thead>
         <tbody>
-          {/* Renderizado dinámico de filas usando el método .map() */}
           {datos.map((item) => (
             <tr key={item.id}>
-              <td style={estilosCelda}>{item.id}</td>
-              <td style={estilosCelda}>{item.nombre}</td>
-              <td style={estilosCelda}>${item.precio}</td>
-              <td style={estilosCelda}>{item.stock} uds.</td>
+              <td style={estilosCelda}>{item.mes}</td>
+              <td style={estilosCelda}>${item.ventas}</td>
+              <td style={estilosCelda}>{item.usuarios}</td>
+              <td style={estilosCelda}>{item.conversion}%</td>
             </tr>
           ))}
         </tbody>

@@ -3,36 +3,40 @@ import Navbar from './components/Navbar';
 import TarjetaMetrica from './components/TarjetaMetrica';
 import TablaDatos from './components/TablaDatos';
 import PanelAnalitico from './components/PanelAnalitico';
-import { obtenerDatosVisualizacion, procesarDatos } from './services/dataService';
+import PanelFiltros from './components/PanelFiltros';
+import DashboardLayout from './components/DashboardLayout';
+import { obtenerDatosVisualizacion, procesarDatos, filtrarDatos } from './services/dataService';
 import './App.css';
 
 function App() {
-  // Manejo de estado utilizando useState[cite: 71]
-  const [datos, setDatos] = useState([]);
-  const [metricas, setMetricas] = useState({
-    totalProductos: 0,
-    valorTotalInventario: 0,
-    totalStock: 0
+  const [datosCrudos, setDatosCrudos] = useState([]);
+  const [datosProcesados, setDatosProcesados] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  // ESTADO GLOBAL DE FILTROS
+  const [filtros, setFiltros] = useState({
+    mes: 'todos',
+    categoria: 'todas'
   });
 
-  // Ejecución de la petición simulada al montar la app con useEffect[cite: 71]
+  // Carga inicial de los datos
   useEffect(() => {
     const cargarDatos = async () => {
-      const dataCruda = await obtenerDatosVisualizacion();
-      const dataProcesada = procesarDatos(dataCruda);
-      
-      setDatos(dataProcesada.filas);
-      setMetricas(dataProcesada.metricas);
+      const datos = await obtenerDatosVisualizacion();
+      setDatosCrudos(datos);
     };
-
     cargarDatos();
   }, []);
 
-  const estilosContenedor = {
-    padding: '40px 32px',
-    maxWidth: '1200px',
-    margin: '0 auto'
-  };
+  // EFECTO QUE ESCUCHA LOS FILTROS
+  useEffect(() => {
+    if (datosCrudos.length > 0) {
+      const datosFiltrados = filtrarDatos(datosCrudos, filtros);
+      const procesados = procesarDatos(datosFiltrados);
+      setDatosProcesados(procesados);
+      setCargando(false);
+    }
+  }, [datosCrudos, filtros]);
 
   const estilosTarjetasGrid = {
     display: 'flex',
@@ -41,31 +45,38 @@ function App() {
     justifyContent: 'space-between'
   };
 
+  if (cargando) return <div>Cargando Dashboard...</div>;
+
   return (
     <div>
       <Navbar />
 
-      <main style={estilosContenedor}>
-        {/* Instancias de TarjetaMetrica con diferentes propiedades[cite: 71] */}
-        <div style={estilosTarjetasGrid}>
-          <TarjetaMetrica 
-            titulo="Total de Productos" 
-            valor={metricas.totalProductos} 
-          />
-          <TarjetaMetrica 
-            titulo="Valor de Inventario" 
-            valor={`$${metricas.valorTotalInventario}`} 
-          />
-          <TarjetaMetrica 
-            titulo="Unidades en Stock" 
-            valor={metricas.totalStock} 
-          />
-        </div>
+      <DashboardLayout 
+        sidebar={
+          <PanelFiltros filtros={filtros} setFiltros={setFiltros} />
+        }
+        main={
+          <>
+            <div style={estilosTarjetasGrid}>
+              <TarjetaMetrica 
+                titulo="Ventas Totales" 
+                valor={`$${datosProcesados.totalVentas}`} 
+              />
+              <TarjetaMetrica 
+                titulo="Usuarios Totales" 
+                valor={datosProcesados.totalUsuarios} 
+              />
+              <TarjetaMetrica 
+                titulo="Meses Mostrados" 
+                valor={datosProcesados.datosOriginales.length} 
+              />
+            </div>
 
-        {/* Instancia de TablaDatos inyectando el estado[cite: 71] */}
-        <TablaDatos datos={datos} />
-        <PanelAnalitico /> 
-      </main>
+            <TablaDatos datos={datosProcesados.datosOriginales} />
+            <PanelAnalitico />
+          </>
+        }
+      />
     </div>
   );
 }
